@@ -1,0 +1,27 @@
+name: Simple Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Eigen
+        # 这一步非常简单：下载 Eigen 压缩包并解压到当前目录
+        run: |
+          curl -L https://gitlab.com/libeigen/eigen/-/archive/3.4.0/eigen-3.4.0.tar.gz -o eigen.tar.gz
+          tar -xzf eigen.tar.gz
+          mv eigen-3.4.0 Eigen
+
+      - name: Install dependencies
+        run: pip install pybind11 setuptools wheel
+
+      - name: Build Wheel
+        run: python setup.py bdist_wheel
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: my_math_package
+          path: dist/*.whl
